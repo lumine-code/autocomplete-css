@@ -1,0 +1,48 @@
+{
+  "name": "autocomplete-css",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "CSS property name and value autocompletions.",
+  "keywords": [
+    "property",
+    "value",
+    "suggestion",
+    "completion",
+    "stylesheet",
+    "scss"
+  ],
+  "repository": "https://github.com/lumine-code/autocomplete-css",
+  "bugs": {
+    "url": "https://github.com/lumine-code/autocomplete-css/issues"
+  },
+  "license": "MIT",
+  "main": "./lib/main.js",
+  "engines": {
+    "lumine": "^1.0.0"
+  },
+  "scripts": {
+    "test": "lumine --test spec",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "update": "node ./update/update.js"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "1.0.0": "provideAutocomplete"
+      }
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@webref/css": "^8.7.0",
+    "@webref/elements": "^2.4.0",
+    "download-git-repo": "^3.0.2",
+    "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-n": "^18.2.2",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.6"
+  }
+}
