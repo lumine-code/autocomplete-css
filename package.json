@@ -17,6 +17,11 @@
   },
   "license": "MIT",
   "main": "./lib/main.js",
+  "files": [
+    "completions.json",
+    "lib",
+    "spec"
+  ],
   "engines": {
     "lumine": "^1.0.0"
   },
