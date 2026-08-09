@@ -55,7 +55,7 @@ const whenEditorReady = function (editor) {
 // * #1191: https://github.com/lumine-code/lumine/pull/1191
 
 Object.keys(packagesToTest).forEach((packageLabel) => {
-  if (!atom.packages.getAvailablePackageNames().includes(packagesToTest[packageLabel].name)) {
+  if (!lumine.packages.getAvailablePackageNames().includes(packagesToTest[packageLabel].name)) {
     console.warn(`Skipping tests for ${packageLabel} because it is not installed`);
     delete packagesToTest[packageLabel];
   }
@@ -89,12 +89,12 @@ describe("CSS property name and value autocompletions", async () => {
 
   beforeEach(() => {
     jasmine.useRealClock();
-    waitsForPromise(() => atom.packages.activatePackage("autocomplete-css"));
-    waitsForPromise(() => atom.packages.activatePackage("language-css")); // Used in all CSS languages
+    waitsForPromise(() => lumine.packages.activatePackage("autocomplete-css"));
+    waitsForPromise(() => lumine.packages.activatePackage("language-css")); // Used in all CSS languages
 
     runs(
       () =>
-        (provider = atom.packages
+        (provider = lumine.packages
           .getActivePackage("autocomplete-css")
           .mainModule.provideAutocomplete()),
     );
@@ -106,11 +106,11 @@ describe("CSS property name and value autocompletions", async () => {
     describe(`${packageLabel} files`, async () => {
       let meta = packagesToTest[packageLabel];
       beforeEach(async () => {
-        await atom.packages.activatePackage(packagesToTest[packageLabel].name);
-        await atom.workspace.open(packagesToTest[packageLabel].file);
-        editor = atom.workspace.getActiveTextEditor();
+        await lumine.packages.activatePackage(packagesToTest[packageLabel].name);
+        await lumine.workspace.open(packagesToTest[packageLabel].file);
+        editor = lumine.workspace.getActiveTextEditor();
         await whenEditorReady(editor);
-        atom.config.set("language.useTreeSitterParsers", meta.useTreeSitter ?? false);
+        lumine.config.set("language.useTreeSitterParsers", meta.useTreeSitter ?? false);
       });
 
       it("returns tag completions when not in a property list", async () => {
@@ -314,15 +314,15 @@ body { }\
       });
 
       it("triggers autocomplete when an property name has been inserted", async () => {
-        spyOn(atom.commands, "dispatch");
+        spyOn(lumine.commands, "dispatch");
         const suggestion = { type: "property", text: "whatever" };
         provider.onDidInsertSuggestion({ editor, suggestion });
         await wait(10);
         // advanceClock(1);
-        expect(atom.commands.dispatch).toHaveBeenCalled();
+        expect(lumine.commands.dispatch).toHaveBeenCalled();
 
-        const { args } = atom.commands.dispatch.mostRecentCall;
-        expect(args[0].tagName.toLowerCase()).toBe("atom-text-editor");
+        const { args } = lumine.commands.dispatch.mostRecentCall;
+        expect(args[0].tagName.toLowerCase()).toBe("lumine-text-editor");
         expect(args[1]).toBe("autocomplete:activate");
       });
 
@@ -713,12 +713,12 @@ div:nth {
     if (packagesToTest[packageLabel].name !== "language-css") {
       describe(`${packageLabel} files`, async () => {
         beforeEach(async () => {
-          await atom.packages.activatePackage(packagesToTest[packageLabel].name);
-          await atom.workspace.open(packagesToTest[packageLabel].file);
-          editor = atom.workspace.getActiveTextEditor();
-          // waitsForPromise(() => atom.packages.activatePackage(packagesToTest[packageLabel].name));
-          // waitsForPromise(() => atom.workspace.open(packagesToTest[packageLabel].file));
-          // return runs(() => editor = atom.workspace.getActiveTextEditor());
+          await lumine.packages.activatePackage(packagesToTest[packageLabel].name);
+          await lumine.workspace.open(packagesToTest[packageLabel].file);
+          editor = lumine.workspace.getActiveTextEditor();
+          // waitsForPromise(() => lumine.packages.activatePackage(packagesToTest[packageLabel].name));
+          // waitsForPromise(() => lumine.workspace.open(packagesToTest[packageLabel].file));
+          // return runs(() => editor = lumine.workspace.getActiveTextEditor());
         });
 
         it("autocompletes tags and properties when nesting inside the property list", async () => {
@@ -803,12 +803,12 @@ body {
 
   describe("SASS files", async () => {
     beforeEach(async () => {
-      await atom.packages.activatePackage("language-sass");
-      await atom.workspace.open("test.sass");
-      editor = atom.workspace.getActiveTextEditor();
-      // waitsForPromise(() => atom.packages.activatePackage('language-sass'));
-      // waitsForPromise(() => atom.workspace.open('test.sass'));
-      // return runs(() => editor = atom.workspace.getActiveTextEditor());
+      await lumine.packages.activatePackage("language-sass");
+      await lumine.workspace.open("test.sass");
+      editor = lumine.workspace.getActiveTextEditor();
+      // waitsForPromise(() => lumine.packages.activatePackage('language-sass'));
+      // waitsForPromise(() => lumine.workspace.open('test.sass'));
+      // return runs(() => editor = lumine.workspace.getActiveTextEditor());
     });
 
     it("autocompletes property names with a prefix", async () => {
@@ -866,16 +866,16 @@ body
     });
 
     it("triggers autocomplete when an property name has been inserted", async () => {
-      spyOn(atom.commands, "dispatch");
+      spyOn(lumine.commands, "dispatch");
       const suggestion = { type: "property", text: "whatever" };
       provider.onDidInsertSuggestion({ editor, suggestion });
 
       await wait(10);
       // advanceClock(1);
-      expect(atom.commands.dispatch).toHaveBeenCalled();
+      expect(lumine.commands.dispatch).toHaveBeenCalled();
 
-      const { args } = atom.commands.dispatch.mostRecentCall;
-      expect(args[0].tagName.toLowerCase()).toBe("atom-text-editor");
+      const { args } = lumine.commands.dispatch.mostRecentCall;
+      expect(args[0].tagName.toLowerCase()).toBe("lumine-text-editor");
       expect(args[1]).toBe("autocomplete:activate");
     });
 
