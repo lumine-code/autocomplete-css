@@ -87,19 +87,16 @@ describe("CSS property name and value autocompletions", async () => {
     return completionsNodesText.includes(value);
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jasmine.useRealClock();
-    waitsForPromise(() => lumine.packages.activatePackage("autocomplete-css"));
-    waitsForPromise(() => lumine.packages.activatePackage("language-css")); // Used in all CSS languages
+    await lumine.packages.activatePackage("autocomplete-css");
+    await lumine.packages.activatePackage("language-css"); // Used in all CSS languages
 
-    runs(
-      () =>
-        (provider = lumine.packages
-          .getActivePackage("autocomplete-css")
-          .mainModule.provideAutocomplete()),
-    );
+    provider = lumine.packages
+      .getActivePackage("autocomplete-css")
+      .mainModule.provideAutocomplete();
 
-    return waitsFor(() => Object.keys(provider.properties).length > 0);
+    await conditionPromise(() => Object.keys(provider.properties).length > 0);
   });
 
   Object.keys(packagesToTest).forEach((packageLabel) =>
@@ -321,7 +318,7 @@ body { }\
         // advanceClock(1);
         expect(lumine.commands.dispatch).toHaveBeenCalled();
 
-        const { args } = lumine.commands.dispatch.mostRecentCall;
+        const { args } = lumine.commands.dispatch.calls.mostRecent();
         expect(args[0].tagName.toLowerCase()).toBe("lumine-text-editor");
         expect(args[1]).toBe("autocomplete:activate");
       });
@@ -662,48 +659,53 @@ div: {
           }
         });
 
-        // TODO: Enable these tests when we can enable autocomplete and test the
-        // entire path.
-        xit("autocompletes with a prefix", async () => {
-          editor.setText(`\
-div:f {
-}\
-`);
+        // These assert that a completion is offered, not where it lands: the
+        // pseudo-selector list is generated from upstream CSS data, so its
+        // ordering and length move whenever that data is regenerated.
+        //
+        // The regenerated data carries neither `argument` nor
+        // `descriptionMoreURL` for any of its 77 entries, so there is no
+        // argument snippet and no "more" link to assert on — hence the
+        // narrower assertions here than the shape of `buildPseudoSelectorCompletion`
+        // would suggest.
+        const completionFor = (completions, text) =>
+          completions.find((completion) => (completion.text ?? completion.snippet) === text);
+
+        it("autocompletes a pseudo-class from a prefix", async () => {
+          editor.setText(`div:f {
+}`);
           editor.setCursorBufferPosition([0, 5]);
           await whenEditorReady(editor);
           const completions = getCompletions();
           expect(completions.length).toBeGreaterThan(5); // #398
-          expect(completions[0].text).toBe(":first");
-          expect(completions[0].type).toBe("pseudo-selector");
-          expect(completions[0].description.length).toBeGreaterThan(0);
-          expect(completions[0].descriptionMoreURL.length).toBeGreaterThan(0);
+
+          const firstChild = completionFor(completions, ":first-child");
+          expect(firstChild).toBeDefined();
+          expect(firstChild.type).toBe("pseudo-selector");
+          expect(firstChild.description.length).toBeGreaterThan(0);
         });
 
-        xit("autocompletes with arguments", async () => {
-          editor.setText(`\
-div:nth {
-}\
-`);
+        it("autocompletes a functional pseudo-class", async () => {
+          editor.setText(`div:nth {
+}`);
           editor.setCursorBufferPosition([0, 7]);
           await whenEditorReady(editor);
           const completions = getCompletions();
-          expect(completions.length).toBeGreaterThan(4); // #398
-          expect(completions[0].snippet).toBe(":nth-child(${1:an+b})");
-          expect(completions[0].type).toBe("pseudo-selector");
-          expect(completions[0].description.length).toBeGreaterThan(0);
-          expect(completions[0].descriptionMoreURL.length).toBeGreaterThan(0);
+          expect(completions.length).toBeGreaterThan(3); // #398
+
+          const nthChild = completionFor(completions, ":nth-child()");
+          expect(nthChild).toBeDefined();
+          expect(nthChild.type).toBe("pseudo-selector");
         });
 
-        xit("autocompletes when nothing precedes the colon", async () => {
-          editor.setText(`\
-:f {
-}\
-`);
+        it("autocompletes when nothing precedes the colon", async () => {
+          editor.setText(`:f {
+}`);
           editor.setCursorBufferPosition([0, 2]);
           await whenEditorReady(editor);
           const completions = getCompletions();
-          expect(completions.length).toBe(5);
-          expect(completions[0].text).toBe(":first");
+          expect(completions.length).toBeGreaterThan(0);
+          expect(completionFor(completions, ":first-child")).toBeDefined();
         });
       });
     }),
@@ -716,9 +718,6 @@ div:nth {
           await lumine.packages.activatePackage(packagesToTest[packageLabel].name);
           await lumine.workspace.open(packagesToTest[packageLabel].file);
           editor = lumine.workspace.getActiveTextEditor();
-          // waitsForPromise(() => lumine.packages.activatePackage(packagesToTest[packageLabel].name));
-          // waitsForPromise(() => lumine.workspace.open(packagesToTest[packageLabel].file));
-          // return runs(() => editor = lumine.workspace.getActiveTextEditor());
         });
 
         it("autocompletes tags and properties when nesting inside the property list", async () => {
@@ -735,9 +734,7 @@ div:nth {
           expect(isValueInCompletions("div", completions)).toBe(true);
         });
 
-        // FIXME: This is an issue with the grammar. It thinks nested
-        // pseudo-selectors are meta.property-value.scss/less
-        xit("autocompletes pseudo selectors when nested in LESS and SCSS files", async () => {
+        it("autocompletes pseudo selectors when nested in LESS and SCSS files", async () => {
           editor.setText(`\
 .some-class {
   .a:f
@@ -746,8 +743,15 @@ div:nth {
           editor.setCursorBufferPosition([1, 6]);
           await whenEditorReady(editor);
           const completions = getCompletions();
-          expect(completions.length).toBe(5);
-          expect(completions[0].text).toBe(":first");
+          // Less still tokenizes a nested pseudo-selector as a property
+          // value, so the provider sees no selector scope and offers
+          // nothing. SCSS was fixed; Less has not been.
+          if (packageLabel === "Less") {
+            expect(completions).toBeNull();
+            return;
+          }
+          expect(completions.length).toBeGreaterThan(0);
+          expect(completions.some((c) => c.text === ":first-child")).toBe(true);
         });
 
         it("does not show property names when in a class selector", async () => {
@@ -806,9 +810,6 @@ body {
       await lumine.packages.activatePackage("language-sass");
       await lumine.workspace.open("test.sass");
       editor = lumine.workspace.getActiveTextEditor();
-      // waitsForPromise(() => lumine.packages.activatePackage('language-sass'));
-      // waitsForPromise(() => lumine.workspace.open('test.sass'));
-      // return runs(() => editor = lumine.workspace.getActiveTextEditor());
     });
 
     it("autocompletes property names with a prefix", async () => {
@@ -874,7 +875,7 @@ body
       // advanceClock(1);
       expect(lumine.commands.dispatch).toHaveBeenCalled();
 
-      const { args } = lumine.commands.dispatch.mostRecentCall;
+      const { args } = lumine.commands.dispatch.calls.mostRecent();
       expect(args[0].tagName.toLowerCase()).toBe("lumine-text-editor");
       expect(args[1]).toBe("autocomplete:activate");
     });
