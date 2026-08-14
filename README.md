@@ -11,11 +11,11 @@ CSS property name and value autocompletions.
 
 ## Installation
 
-To install `autocomplete-css` search for _autocomplete-css_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/autocomplete-css`.
+To install `autocomplete-css` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/autocomplete-css`.
 
 ## Services
 
-- **autocomplete.provider** (`1.0.0`): provided to supply CSS property and value suggestions to autocomplete.
+- `autocomplete.provider`: provided to supply CSS property and value suggestions to autocomplete.
 
 ## Contributing
 
