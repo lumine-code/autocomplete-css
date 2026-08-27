@@ -107,7 +107,7 @@ describe("CSS property name and value autocompletions", async () => {
         await lumine.workspace.open(packagesToTest[packageLabel].file);
         editor = lumine.workspace.getActiveTextEditor();
         await whenEditorReady(editor);
-        lumine.config.set("language.useTreeSitterParsers", meta.useTreeSitter ?? false);
+        lumine.config.set("editor.useTreeSitterParsers", meta.useTreeSitter ?? false);
       });
 
       it("returns tag completions when not in a property list", async () => {
