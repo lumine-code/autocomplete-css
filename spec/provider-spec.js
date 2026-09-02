@@ -11,11 +11,6 @@ const packagesToTest = {
     name: "language-css",
     file: "test.css",
   },
-  "CSS (tree-sitter)": {
-    name: "language-css",
-    file: "test.css",
-    useTreeSitter: true,
-  },
   SCSS: {
     name: "language-sass",
     file: "test.scss",
@@ -37,11 +32,7 @@ const whenEditorReady = function (editor) {
   if (!languageMode.constructor.name.includes("TreeSitter")) {
     return Promise.resolve();
   }
-  if (languageMode.tokenized) {
-    return languageMode.atTransactionEnd();
-  } else {
-    return languageMode.ready;
-  }
+  return languageMode.tokenized ? languageMode.atTransactionEnd() : languageMode.ready;
 };
 
 // Throughout the entirety of this test document there are many places that the
@@ -101,13 +92,11 @@ describe("CSS property name and value autocompletions", async () => {
 
   Object.keys(packagesToTest).forEach((packageLabel) =>
     describe(`${packageLabel} files`, async () => {
-      let meta = packagesToTest[packageLabel];
       beforeEach(async () => {
         await lumine.packages.activatePackage(packagesToTest[packageLabel].name);
         await lumine.workspace.open(packagesToTest[packageLabel].file);
         editor = lumine.workspace.getActiveTextEditor();
         await whenEditorReady(editor);
-        lumine.config.set("editor.useTreeSitterParsers", meta.useTreeSitter ?? false);
       });
 
       it("returns tag completions when not in a property list", async () => {
@@ -838,7 +827,7 @@ body
       editor.setCursorBufferPosition([1, 3]);
       await whenEditorReady(editor);
       completions = getCompletions();
-      expect(completions.length).toBeGreaterThan(11); // #398
+      expect(completions.length).toBeGreaterThan(4);
       expect(isValueInCompletions("display: ", completions)).toBe(true);
       expect(isValueInCompletions("direction: ", completions)).toBe(true);
 

@@ -26,6 +26,7 @@
     "lumine": "^1.0.0"
   },
   "specPackages": [
+    "language-css",
     "language-sass"
   ],
   "scripts": {
