@@ -2,7 +2,8 @@
 
 CSS property name and value autocompletions.
 
-**Archived:** this package is no longer maintained. Use [ide-css](https://github.com/lumine-code/ide-css) for CSS, SCSS and Less, or [ide-sass](https://github.com/lumine-code/ide-sass) for indented Sass, together with [ide-client](https://github.com/lumine-code/ide-client) and [autocomplete](https://github.com/lumine-code/autocomplete).
+> [!WARNING]
+> **This package is deprecated.** CSS, SCSS and Less completion is now provided by [ide-css](https://github.com/lumine-code/ide-css), and indented Sass completion by [ide-sass](https://github.com/lumine-code/ide-sass), through [ide-client](https://github.com/lumine-code/ide-client) and [autocomplete](https://github.com/lumine-code/autocomplete). This repository is archived and no longer maintained.
 
 ## Features
 
