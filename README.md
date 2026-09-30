@@ -2,6 +2,8 @@
 
 CSS property name and value autocompletions.
 
+**Archived:** this package is no longer maintained. Use [ide-css](https://github.com/lumine-code/ide-css) for CSS, SCSS and Less, or [ide-sass](https://github.com/lumine-code/ide-sass) for indented Sass, together with [ide-client](https://github.com/lumine-code/ide-client) and [autocomplete](https://github.com/lumine-code/autocomplete).
+
 ## Features
 
 - **Property completions**: suggests CSS property names as you type.
@@ -9,9 +11,21 @@ CSS property name and value autocompletions.
 - **Pseudo-selector completions**: suggests pseudo-selectors and pseudo-elements.
 - **Language support**: works in CSS, Sass, SCSS, and PostCSS source.
 
-## Installation
+## Migration
 
-To install `autocomplete-css` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/autocomplete-css`.
+Disable or uninstall `autocomplete-css` and install `ide-client` with the adapter for your stylesheet syntax. Keep `autocomplete` installed to display completion suggestions.
+
+```sh
+lumine --install lumine-code/ide-client
+lumine --install lumine-code/ide-css
+lumine --install lumine-code/autocomplete
+```
+
+For indented `.sass` files, install `ide-sass` instead of, or alongside, `ide-css`.
+
+```sh
+lumine --install lumine-code/ide-sass
+```
 
 ## Services
 
