@@ -2,6 +2,8 @@
 
 CSS property name and value autocompletions.
 
+Fork of [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) (`packages/autocomplete-css`).
+
 > [!WARNING]
 > **This package is deprecated.** CSS, SCSS and Less completion is now provided by [ide-css](https://github.com/lumine-code/ide-css), and indented Sass completion by [ide-sass](https://github.com/lumine-code/ide-sass), through [ide-client](https://github.com/lumine-code/ide-client) and [autocomplete](https://github.com/lumine-code/autocomplete). This repository is archived and no longer maintained.
 
